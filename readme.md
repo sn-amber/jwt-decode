@@ -7,7 +7,7 @@ JWT-Decode is a json web token decoder
 Get the tool via
 
 ```
-go get -i github.com/sn-amber/jwt-decode
+go get github.com/sn-amber/jwt-decode
 ```
 
 Use either by piping a token into `jwt-decode`

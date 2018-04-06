@@ -1,5 +1,7 @@
 # JWT-Decode
 
+[![Build Status](https://travis-ci.org/snamber/jwt-decode.svg?branch=master)](https://travis-ci.org/snamber/jwt-decode)
+
 JWT-Decode is a json web token decoder
 
 # Usage

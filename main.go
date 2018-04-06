@@ -1,14 +1,14 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
 	"encoding/base64"
-	"strings"
 	"encoding/json"
-	"fmt"
-	"log"
 	"flag"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"strings"
 )
 
 var (
@@ -31,10 +31,10 @@ func main() {
 
 	for _, segment := range segments[:len(segments)-1] {
 
-		data, err := base64ToJson(segment)
+		data, err := base64ToJSON(segment)
 		fatalOnErr(err, "cannot decode from base64")
 
-		err = prettyPrintJson(data)
+		err = prettyPrintJSON(data)
 		fatalOnErr(err, "cannot pretty-print json")
 	}
 }
@@ -47,7 +47,7 @@ func readTokenFromStdin() (string, error) {
 	return string(bt), nil
 }
 
-func base64ToJson(str string) (interface{}, error) {
+func base64ToJSON(str string) (interface{}, error) {
 
 	// decode
 	decoded, err := base64.RawStdEncoding.DecodeString(str)
@@ -64,7 +64,7 @@ func base64ToJson(str string) (interface{}, error) {
 	return parsed, nil
 }
 
-func prettyPrintJson(data interface{}) error {
+func prettyPrintJSON(data interface{}) error {
 	bt, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err

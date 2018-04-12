@@ -16,8 +16,8 @@ import (
 )
 
 var (
-	token string
-	utc   bool
+	token    string
+	datetime bool
 
 	errValWrongType   = errors.New("Value of 'exp' not convertible to int")
 	errTokenWrongType = errors.New("Token not of shape map[string]interface{}")
@@ -27,7 +27,7 @@ var (
 func main() {
 
 	flag.StringVar(&token, "token", "", "token to be decoded")
-	flag.BoolVar(&utc, "utc", false, "whether to print UTC timestamp, instead of unix time for \"exp\"")
+	flag.BoolVar(&datetime, "datetime", false, "whether to print timestamp, instead of unix time for \"exp\"")
 	flag.Parse()
 
 	if token == "" {
@@ -41,7 +41,7 @@ func main() {
 
 	for i, segment := range segments[:len(segments)-1] {
 
-		data, err := base64ToJSON(segment, utc)
+		data, err := base64ToJSON(segment, datetime)
 		if err != nil {
 			if err != errTokenWrongType && err != errKeyNotFound && err != errValWrongType { // external error
 				fatalOnErr(err, "cannot decode from base64")

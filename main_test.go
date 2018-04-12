@@ -35,7 +35,7 @@ func Test_base64ToJSON(t *testing.T) {
 				utcFlag: true,
 			},
 			want: map[string]interface{}{
-				"exp":  time.Date(2018, 4, 12, 17, 29, 36, 0, time.Local),
+				"exp":  time.Date(2018, 4, 12, 15, 29, 36, 0, time.UTC).In(time.Local),
 				"kind": "nil",
 				"name": "foo",
 			},

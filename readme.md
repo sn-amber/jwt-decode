@@ -36,7 +36,7 @@ both will print the following
   "Kind": 0,
   "Name": "test",
   "exp": 1.523098613e+09
-}](assets/without_datetime.svg)
+}](assets/without_datetime.png)
 
 Use the flag `-datetime` to print the `exp` expiration date in datetime format:
 
@@ -49,4 +49,4 @@ Use the flag `-datetime` to print the `exp` expiration date in datetime format:
   "Name": "test",
   "exp": "2018-04-07T12:56:53+02:00"
 }
-](assets/with_datetime.svg)
+](assets/with_datetime.png)

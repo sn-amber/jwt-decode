@@ -3,21 +3,31 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (
 	token string
+	utc   bool
+
+	errValWrongType   = errors.New("Value of 'exp' not convertible to int")
+	errTokenWrongType = errors.New("Token not of shape map[string]interface{}")
+	errKeyNotFound    = errors.New("Key 'exp' not found")
 )
 
 func main() {
 
 	flag.StringVar(&token, "token", "", "token to be decoded")
+	flag.BoolVar(&utc, "utc", false, "whether to print UTC timestamp, instead of unix time for \"exp\"")
 	flag.Parse()
 
 	if token == "" {
@@ -29,11 +39,16 @@ func main() {
 	// split token into three parts
 	segments := strings.Split(token, ".")
 
-	for _, segment := range segments[:len(segments)-1] {
+	for i, segment := range segments[:len(segments)-1] {
 
-		data, err := base64ToJSON(segment)
-		fatalOnErr(err, "cannot decode from base64")
-
+		data, err := base64ToJSON(segment, utc)
+		if err != nil {
+			if err != errTokenWrongType && err != errKeyNotFound && err != errValWrongType { // external error
+				fatalOnErr(err, "cannot decode from base64")
+			} else if i == 1 { // exp error
+				logrus.Warn("could not extract expiration datetime: ", err)
+			}
+		}
 		err = prettyPrintJSON(data)
 		fatalOnErr(err, "cannot pretty-print json")
 	}
@@ -47,7 +62,7 @@ func readTokenFromStdin() (string, error) {
 	return string(bt), nil
 }
 
-func base64ToJSON(str string) (interface{}, error) {
+func base64ToJSON(str string, utcFlag bool) (interface{}, error) {
 
 	// decode
 	decoded, err := base64.RawStdEncoding.DecodeString(str)
@@ -60,6 +75,28 @@ func base64ToJSON(str string) (interface{}, error) {
 	err = json.Unmarshal(decoded, &parsed)
 	if err != nil {
 		return "", err
+	}
+	if utcFlag {
+		if p, ok := parsed.(map[string]interface{}); ok {
+
+			found := false
+			for key, val := range p {
+				if key == "exp" {
+					found = true
+					if v, ok := val.(float64); ok {
+						p[key] = time.Unix(int64(v), 0)
+					} else {
+						return parsed, errValWrongType
+					}
+				}
+			}
+
+			if !found {
+				return parsed, errKeyNotFound
+			}
+			return p, nil
+		}
+		return parsed, errTokenWrongType
 	}
 	return parsed, nil
 }
